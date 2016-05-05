@@ -16,6 +16,15 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+#Removido uso do _nested* - Verificar efeito colateral
+#from rest_framework_nested import routers
+from rest_framework import routers
+from genseq.views import UsuarioViewSet
+
+router = routers.SimpleRouter()
+router.register(r'usuarios', UsuarioViewSet)
+
 urlpatterns = [
+	url(r'^genseq_api/', include(router.urls)),
     url(r'^admin/', include(admin.site.urls)),
 ]

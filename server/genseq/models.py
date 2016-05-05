@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
 from django.utils	 import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -31,14 +33,45 @@ class  KitDeplecao(models.Model):
 	"""Tipos kits de deplecao utilizados na analise de cada amostra na corrida"""
 	descricao = models.CharField(max_length = 50)
 
-class Usuario(models.Model):
+class UsuarioManager(BaseUserManager):
+
+	def create_user(self, email, password=None, **kwargs):
+		if not email:
+			raise ValueError('Por favor, digite um email valido.')
+
+		if not kwargs.get('nome'):
+			raise ValueError('Por favor, digite o nome completo.')
+
+		usuario = self.model(
+			email = self.normalize_email(email), nome = kwargs.get('nome')
+		)
+
+		usuario.set_password(password)
+		usuario.save()
+
+		return usuario
+
+	def create_superuser(self, email, password, **kwargs):
+		usuario = self.create_user(email, password, **kwargs)
+
+		nivel_acesso = NivelAcesso.objects.get(descricao = 'Administrador')
+		usuario.nivel_acesso = nivel_acesso
+
+		status_usuario = StatusUsuario.objects.get(descricao = 'Ativo')
+		usuario.status_usuario = status_usuario
+
+		usuario.save()
+
+		return usuario
+
+class Usuario(AbstractBaseUser):
 	""" Usuario utilizador do sistema. Seu papel e definido pelo modelo
 	NivelAcesso"""
 
-	nivel_acesso = models.ForeignKey(NivelAcesso)
-	responsavel = models.ForeignKey('self')
-	status = models.ForeignKey(StatusUsuario)
-	instituicao = models.ForeignKey(Instituicao)
+	nivel_acesso = models.ForeignKey(NivelAcesso, null = True)
+	responsavel = models.ForeignKey('self', null = True)
+	status = models.ForeignKey(StatusUsuario, null = True)
+	instituicao = models.ForeignKey(Instituicao, null = True)
 
 	nome = models.CharField(max_length = 100, blank = False)
 	telefone = models.CharField(max_length = 11, blank = True)
@@ -48,8 +81,18 @@ class Usuario(models.Model):
 	criado_em = models.DateTimeField(auto_now_add = True)
 	atualizado_em = models.DateTimeField(auto_now = True)
 
+	objects = UsuarioManager()
+
+	USERNAME_FIELD = 'email'
+	REQUIRED_FIELDS = ['nome']
+
+	def __unicode__(self):
+		return self.email
+
 	def get_full_name(self):
 		return self.nome
+
+
 
 class PapelProjeto(models.Model):
 	"""Definicao do papel do usuario dentro de um projeto"""

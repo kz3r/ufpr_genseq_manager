@@ -1,4 +1,9 @@
-from rest_framework import permissions, viewsets
+import json
+
+from django.contrib.auth import authenticate, login
+
+from rest_framework import status, views, permissions, viewsets
+from rest_framework.response import Response
 
 from genseq.models import Usuario
 from genseq.permissions import IsAccountOwner
@@ -11,7 +16,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
 	def get_permissions(self):
 		if self.request.method in permissions.SAFE_METHODS:
-			return (permission.AllowAny(),)
+			return (permissions.AllowAny(),)
 
 		if self.request.method == 'POST':
 			return (permissions.AllowAny(),)

@@ -2,6 +2,21 @@ from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
 from genseq.models import StatusUsuario	
 from genseq.models import Usuario
+from genseq.models import Servico
+
+class ServicoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Servico
+		fields = ('id', 'descricao')
+
+		def create(self, validated_data):
+			return Servico.objects.create(**validated_data)
+		def update(self, instance, validated_data):
+			instance.descricao  = validated_data.get('descricao', instance.descricao)
+
+			instance.save()
+
+			return instance
 
 class StatusUsuarioSerializer(serializers.ModelSerializer):
 	

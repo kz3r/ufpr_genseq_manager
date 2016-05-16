@@ -20,9 +20,11 @@ from django.contrib import admin
 #from rest_framework_nested import routers
 from rest_framework import routers
 from genseq.views import UsuarioViewSet
+from genseq.views import ServicoViewSet
 
 router = routers.SimpleRouter()
 router.register(r'usuarios', UsuarioViewSet)
+router.register(r'servicos', ServicoViewSet)
 
 urlpatterns = [
 	url(r'^genseq_api/', include(router.urls)),

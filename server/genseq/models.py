@@ -24,10 +24,26 @@ class  StatusAmostra(models.Model):
 class  Sistema(models.Model):
 	"""Equipamentos que realizam as corridas de sequenciamento"""
 	descricao = models.CharField(max_length = 50)
+class ServicoManager(models.Manager):
+
+	def create_servico(self, **kwargs):
+
+		if not kwargs.get('descricao'):
+			raise ValueError('Por favor, digite uma descricao.')
+
+		servico = self.model(
+			 descricao = kwargs.get('descricao')
+		)
+		servico.save()
+
+		return servico
+
 
 class  Servico(models.Model):
 	"""Tipos de analises que podem ser feitas com os equipamentos"""
 	descricao = models.CharField(max_length = 50)
+
+	objects = ServicoManager()
 
 class  KitDeplecao(models.Model):
 	"""Tipos kits de deplecao utilizados na analise de cada amostra na corrida"""
@@ -37,7 +53,7 @@ class UsuarioManager(BaseUserManager):
 
 	def create_user(self, email, password=None, **kwargs):
 		if not email:
-			raise ValueError('Por favor, digite um email valido.')
+			raise ValueError('Por favor, digite um email valido.')	
 
 		if not kwargs.get('nome'):
 			raise ValueError('Por favor, digite o nome completo.')

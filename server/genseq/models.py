@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils	 import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -21,9 +20,26 @@ class  StatusAmostra(models.Model):
 	"""Definicao dos possiveis status do ciclo de vida da amostra"""
 	descricao = models.CharField(max_length = 50)
 
+
+class SistemaManager(models.Manager):
+
+	def create_sistema(self, **kwargs):
+
+		if not kwargs.get('descricao'):
+			raise ValueError('Por favor, digite uma descricao.')
+
+		sistema= self.model(
+			 descricao = kwargs.get('descricao')
+		)
+		sistema.save()
+
+		return sistema
+
 class  Sistema(models.Model):
 	"""Equipamentos que realizam as corridas de sequenciamento"""
 	descricao = models.CharField(max_length = 50)
+	objects = SistemaManager()
+
 class ServicoManager(models.Manager):
 
 	def create_servico(self, **kwargs):
@@ -45,9 +61,25 @@ class  Servico(models.Model):
 
 	objects = ServicoManager()
 
+class KitDeplecaoManager(models.Manager):
+
+	def create_kit_deplecao(self, **kwargs):
+
+		if not kwargs.get('descricao'):
+			raise ValueError('Por favor, digite uma descricao.')
+
+		kit_deplecao = self.model(
+			 descricao = kwargs.get('descricao')
+		)
+		kit_deplecao.save()
+
+		return kit_deplecao
+
 class  KitDeplecao(models.Model):
 	"""Tipos kits de deplecao utilizados na analise de cada amostra na corrida"""
 	descricao = models.CharField(max_length = 50)
+
+	objects = KitDeplecaoManager()
 
 class UsuarioManager(BaseUserManager):
 

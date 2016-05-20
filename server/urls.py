@@ -19,7 +19,7 @@ from django.contrib import admin
 #Removido uso do _nested* - Verificar efeito colateral
 #from rest_framework_nested import routers
 from rest_framework import routers
-from genseq.views import UsuarioViewSet, ServicoViewSet, SistemaViewSet, KitDeplecaoViewSet
+from genseq.views import UsuarioViewSet, ServicoViewSet, SistemaViewSet, KitDeplecaoViewSet,LoginView, LogoutView
 
 router = routers.SimpleRouter()
 router.register(r'usuarios', UsuarioViewSet)
@@ -29,5 +29,7 @@ router.register(r'kit_deplecao', KitDeplecaoViewSet)
 
 urlpatterns = [
 	url(r'^genseq_api/', include(router.urls)),
+    url(r'^genseq_api/login/$', LoginView.as_view(), name='login'),
+    url(r'^genseq_api/logout/$', LogoutView.as_view(), name='logout'),
     url(r'^admin/', include(admin.site.urls)),
 ]

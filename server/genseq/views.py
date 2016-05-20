@@ -1,6 +1,8 @@
+# coding=UTF-8
+
 import json
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
@@ -40,6 +42,47 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 			'status': 'Bad request',
 			'message': 'Usuario nao pode ser inserido com os dados recebidos'
 		}, status = status.HTTP_400_BAD_REQUEST)
+
+class LoginView(views.APIView):
+	def post(self, request, format=None):
+		print('IM IN')
+
+		data = json.loads(request.body.decode())
+
+
+		email = data.get('email', None)
+		password = data.get('password', None)
+
+		usuario = authenticate(email = email, password = password)
+
+		if usuario is not None:
+			if usuario.is_active:
+				login(request, usuario)
+
+				serialized = UsuarioSerializer(usuario)
+
+				return Response(serialized.data)
+			else:
+				return Response({
+					'status': 'Unauthorized',
+					'message': 'Sua conta está desativada'
+				}, status = status.HTTP_401_UNAUTHORIZED)
+		else:
+			return Response({
+				'status': 'Unauthorized',
+				'message': 'Nome de usuário ou senha inválidos'
+			}, status = status.HTTP_401_UNAUTHORIZED)
+
+class LogoutView(views.APIView):
+	print('ONLOGOUT')
+	permission_classes = (permissions.IsAuthenticated,)
+	print('AFTERPERMS')
+
+	def post(self, request, format=None):
+		print('ONPOST')
+		logout(request)
+
+		return Response({}, status = status.HTTP_204_NO_CONTENT)
 
 class ServicoViewSet(viewsets.ModelViewSet):
 	queryset = Servico.objects.all()

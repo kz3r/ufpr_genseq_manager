@@ -74,12 +74,12 @@ class LoginView(views.APIView):
 			}, status = status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(views.APIView):
-	print('ONLOGOUT')
-	permission_classes = (permissions.IsAuthenticated,)
-	print('AFTERPERMS')
+	
+	#PERMISSION CLASS BLOQUEANDO O ACESSO. PORQUE?
+	#permission_classes = (permissions.IsAuthenticated,)
+	#print(permission_classes)
 
 	def post(self, request, format=None):
-		print('ONPOST')
 		logout(request)
 
 		return Response({}, status = status.HTTP_204_NO_CONTENT)

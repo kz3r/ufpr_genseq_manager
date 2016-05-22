@@ -3,10 +3,24 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils	 import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+class InstituicaoManager(models.Manager):
+
+	def create_instituicao(self, **kwargs):
+
+		if not kwargs.get('nome'):
+			raise ValueError('Por favor, digite uma nome.')
+
+		nome= self.model(
+			 nome = kwargs.get('nome')
+		)
+		nome.save()
+
+		return nome
 
 class Instituicao(models.Model):
 	""" Cadastro da instituicao de ensino/pesquisa """
 	nome = models.CharField(max_length = 100)
+	objects = InstituicaoManager()
 
 class NivelAcesso(models.Model):
 	""" Restricoes de seguranca e tipos de usuario """

@@ -1,6 +1,22 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
-from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao
+from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao
+
+
+
+class InstituicaoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Instituicao
+		fields = ('id', 'nome')
+
+		def create(self, validated_data):
+			return Instituicao.objects.create(**validated_data)
+		def update(self, instance, validated_data):
+			instance.nome  = validated_data.get('nome', instance.nome)
+
+			instance.save()
+
+			return instance
 
 class KitDeplecaoSerializer(serializers.ModelSerializer):
 	class Meta:

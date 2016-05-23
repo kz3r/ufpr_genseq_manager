@@ -1,7 +1,44 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
-from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao
+from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto
 
+class UsuarioSerializer(serializers.ModelSerializer):
+	password = serializers.CharField (write_only = True, required = False)
+	confirm_password = serializers.CharField (write_only = True, required = False)
+
+	class Meta:
+		model = Usuario
+
+		fields = ('nivel_acesso', 'status', 'responsavel', 'instituicao',
+					 'nome', 'telefone', 'setor', 'email',
+					 'password', 'confirm_password',)
+
+		read_only_fields = ('criado_em', 'atualizado_em',)
+
+		def create(self, validated_data):
+			return Usuario.objects.create(**validated_data)
+
+		def update(self, instance, validated_data):
+			instance.nome = validated_data.get('nome', instance.nome)
+			instance.nivel_acesso = validated_data.get('nivel_acesso', instance.nivel_acesso)
+			instance.status = validated_data.get('status', instance.status)
+			instance.instituicao = validated_data.get('instituicao', instance.instituicao)
+			instance.telefone = validated_data.get('telefone', instance.telefone)
+			instance.setor = validated_data.get('setor', instance.setor)
+			instance.email = validated_data.get('email', instance.email)
+
+			instance.save()
+
+			password = validated_data.get('password', None)
+			confirm_password = validated_data.get('confirm_password', None)
+
+			if password and confirm_password and password == confirm_password:
+				instance.set_password(password)
+				instance.save()
+
+			update_session_auth_hash(self.context.get('request'), instance)
+
+			return instance
 
 
 class InstituicaoSerializer(serializers.ModelSerializer):
@@ -13,6 +50,28 @@ class InstituicaoSerializer(serializers.ModelSerializer):
 			return Instituicao.objects.create(**validated_data)
 		def update(self, instance, validated_data):
 			instance.nome  = validated_data.get('nome', instance.nome)
+
+			instance.save()
+
+			return instance
+
+class ProjetoSerializer(serializers.ModelSerializer):
+
+	instituicao = InstituicaoSerializer()
+	autorizado_por = UsuarioSerializer()
+	class Meta:
+
+		model = Projeto
+
+		fields = ('nome', 'descricao', 'instituicao', 'autorizado_por')
+
+
+		def create(self, validated_data):
+			return Projeto.objects.create(**validated_data)
+
+		def update(self, instance, validated_data):
+			instance.nome = validated_data.get('nome', instance.nome)
+			instance.descricao = validated_data.get('descricao', instance.nivel_acesso)
 
 			instance.save()
 
@@ -74,44 +133,6 @@ class StatusUsuarioSerializer(serializers.ModelSerializer):
 			instance.descricao = validated_data.get('descricao', instance.descricao)
 
 			instance.save()
-
-			return instance
-
-class UsuarioSerializer(serializers.ModelSerializer):
-	password = serializers.CharField (write_only = True, required = False)
-	confirm_password = serializers.CharField (write_only = True, required = False)
-
-	class Meta:
-		model = Usuario
-
-		fields = ('nivel_acesso', 'status', 'responsavel', 'instituicao',
-					 'nome', 'telefone', 'setor', 'email',
-					 'password', 'confirm_password',)
-
-		read_only_fields = ('criado_em', 'atualizado_em',)
-
-		def create(self, validated_data):
-			return Usuario.objects.create(**validated_data)
-
-		def update(self, instance, validated_data):
-			instance.nome = validated_data.get('nome', instance.nome)
-			instance.nivel_acesso = validated_data.get('nivel_acesso', instance.nivel_acesso)
-			instance.status = validated_data.get('status', instance.status)
-			instance.instituicao = validated_data.get('instituicao', instance.instituicao)
-			instance.telefone = validated_data.get('telefone', instance.telefone)
-			instance.setor = validated_data.get('setor', instance.setor)
-			instance.email = validated_data.get('email', instance.email)
-
-			instance.save()
-
-			password = validated_data.get('password', None)
-			confirm_password = validated_data.get('confirm_password', None)
-
-			if password and confirm_password and password == confirm_password:
-				instance.set_password(password)
-				instance.save()
-
-			update_session_auth_hash(self.context.get('request'), instance)
 
 			return instance
 

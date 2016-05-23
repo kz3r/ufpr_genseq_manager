@@ -8,8 +8,8 @@ from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
 
 from genseq.permissions import IsAccountOwner
-from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer
+from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -202,4 +202,35 @@ class InstituicaoViewSet(viewsets.ModelViewSet):
 		return Response({
 			'status': 'Bad request',
 			'message': 'Instituicao nao pode ser inserido com os dados recebidos'
+			}, status = status.HTTP_400_BAD_REQUEST)
+
+
+class ProjetoViewSet(viewsets.ModelViewSet):
+	queryset = Projeto.objects.all()
+	serializer_class = ProjetoSerializer
+
+	def get_permissions(self):
+		if self.request.method in permissions.SAFE_METHODS:
+			return (permissions.AllowAny(),)
+
+		if self.request.method == 'POST':
+			return (permissions.AllowAny(),)
+
+		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+
+	def create(self, request):
+		serializer = self.serializer_class(data=request.data)
+
+		if serializer.is_valid():
+			Projeto.objects.create_projeto(**serializer.validated_data)
+
+			response = Response(serializer.validated_data, status = status.HTTP_201_CREATED)
+			response['Access-Control-Allow-Origin'] = '*'
+			response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+
+			return response
+
+		return Response({
+			'status': 'Bad request',
+			'message': 'Projeto nao pode ser inserido com os dados recebidos'
 			}, status = status.HTTP_400_BAD_REQUEST)

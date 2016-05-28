@@ -57,14 +57,13 @@ class InstituicaoSerializer(serializers.ModelSerializer):
 
 class ProjetoSerializer(serializers.ModelSerializer):
 
-	instituicao = InstituicaoSerializer()
-	autorizado_por = UsuarioSerializer()
 	class Meta:
 
+		abstract = True
 		model = Projeto
 
-		fields = ('nome', 'descricao', 'instituicao', 'autorizado_por')
-
+		fields = ('id', 'nome', 'descricao', 'instituicao')
+		read_only_fields = ('criado_em', 'atualizado_em', 'autorizado_em')
 
 		def create(self, validated_data):
 			return Projeto.objects.create(**validated_data)
@@ -76,6 +75,15 @@ class ProjetoSerializer(serializers.ModelSerializer):
 			instance.save()
 
 			return instance
+
+class ProjetoReadSerializer(ProjetoSerializer):
+    instituicao = InstituicaoSerializer()
+
+    class Meta:
+
+		model = Projeto
+
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em')
 
 class KitDeplecaoSerializer(serializers.ModelSerializer):
 	class Meta:

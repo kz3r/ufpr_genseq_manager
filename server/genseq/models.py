@@ -175,17 +175,18 @@ class Amostra(models.Model):
 	qualidade = models.DecimalField(max_digits = 10, decimal_places = 3)
 	tipo = models.CharField(max_length = 1, choices = escolhas_tipo_organismo)
 	observacao = models.CharField(max_length = 100)
-	autorizado_em = models.DateTimeField()
+	autorizado_em = models.DateTimeField(null = True)
 
 	criado_em = models.DateTimeField(auto_now_add = True)
 	atualizado_em = models.DateTimeField(auto_now = True)
+
 
 class Projeto(models.Model):
 	"""Projeto ao qual as amostras enviadas farao parte. Pertence a uma
 	instituicao e possui usuario responsavel"""
 	instituicao = models.ForeignKey(Instituicao)
-	autorizado_por = models.ForeignKey(Usuario, related_name = 'projeto_usuario_autorizacao')
-	autorizado_em = models.DateTimeField()
+	autorizado_por = models.ForeignKey(Usuario, related_name = 'projeto_usuario_autorizacao', null = True, blank = True)
+	autorizado_em = models.DateTimeField(null = True, blank = True )
 
 	nome = models.CharField(max_length = 100)
 	descricao = models.TextField()
@@ -203,6 +204,7 @@ class Projeto(models.Model):
 
 	criado_em = models.DateTimeField(auto_now_add = True)
 	atualizado_em = models.DateTimeField(auto_now = True)
+
 
 class UsuarioProjeto(models.Model):
 	""" Relacao de projetos que um usuario participa e seu papel no mesmo """

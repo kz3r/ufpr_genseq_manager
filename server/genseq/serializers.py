@@ -1,6 +1,6 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
-from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto
+from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto
 
 class UsuarioSerializer(serializers.ModelSerializer):
 	password = serializers.CharField (write_only = True, required = False)
@@ -9,7 +9,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Usuario
 
-		fields = ('nivel_acesso', 'status', 'responsavel', 'instituicao',
+		fields = ('id','nivel_acesso', 'status', 'responsavel', 'instituicao',
 					 'nome', 'telefone', 'setor', 'email',
 					 'password', 'confirm_password',)
 
@@ -55,14 +55,27 @@ class InstituicaoSerializer(serializers.ModelSerializer):
 
 			return instance
 
-class ProjetoSerializer(serializers.ModelSerializer):
 
+class UsuarioProjetoSerializer(serializers.HyperlinkedModelSerializer):
+
+	usuario = serializers.Field(source='usuario.id')
+	nome = serializers.Field(source='usuario.nome')
+
+	class Meta:
+		model = UsuarioProjeto
+
+		fields = ('usuario','nome')
+
+
+class ProjetoSerializer(serializers.ModelSerializer):
+	
+	membros = UsuarioProjetoSerializer(source='usuarioprojeto_set', many=True)
 	class Meta:
 
 		abstract = True
 		model = Projeto
 
-		fields = ('id', 'nome', 'descricao', 'instituicao')
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'membros')
 		read_only_fields = ('criado_em', 'atualizado_em', 'autorizado_em')
 
 		def create(self, validated_data):
@@ -76,14 +89,16 @@ class ProjetoSerializer(serializers.ModelSerializer):
 
 			return instance
 
+
 class ProjetoReadSerializer(ProjetoSerializer):
     instituicao = InstituicaoSerializer()
+    membros = UsuarioSerializer(many=True)
 
     class Meta:
 
 		model = Projeto
 
-		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em')
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em', 'membros')
 
 class KitDeplecaoSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -98,6 +113,7 @@ class KitDeplecaoSerializer(serializers.ModelSerializer):
 			instance.save()
 
 			return instance
+
 
 class SistemaSerializer(serializers.ModelSerializer):
 	class Meta:

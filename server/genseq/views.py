@@ -8,8 +8,8 @@ from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
 
 from genseq.permissions import IsAccountOwner
-from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer, ProjetoReadSerializer
+from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer, ProjetoReadSerializer, UsuarioProjetoSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -205,6 +205,7 @@ class InstituicaoViewSet(viewsets.ModelViewSet):
 			}, status = status.HTTP_400_BAD_REQUEST)
 
 
+
 class ProjetoViewSet(viewsets.ModelViewSet):
 	queryset = Projeto.objects.all()
 	serializer_class = ProjetoSerializer
@@ -223,4 +224,18 @@ class ProjetoViewSet(viewsets.ModelViewSet):
 			return (permissions.AllowAny(),)
 
 		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+
+	def create(self, request, format=None):
+		r = ProjetoSerializer(data=request.data)
+		if r.is_valid():
+			u = r.save()
+			u = r.save()
+			m = request.data['membros']
+			for membro in m:
+				membro_id = membro['id']
+				s = UsuarioProjetoSerializer(data={'projeto':u.id, 'usuario':membro_id, 'papel':1})
+				if s.is_valid():
+					s.save()
+			return Response(r.data, status=status.HTTP_201_CREATED)
+		return Response(r.errors, status=status.HTTP_400_BAD_REQUEST)
 

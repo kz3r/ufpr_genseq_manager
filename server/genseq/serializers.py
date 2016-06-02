@@ -55,21 +55,8 @@ class InstituicaoSerializer(serializers.ModelSerializer):
 
 			return instance
 
-
-class UsuarioProjetoSerializer(serializers.HyperlinkedModelSerializer):
-
-	usuario = serializers.Field(source='usuario.id')
-	nome = serializers.Field(source='usuario.nome')
-
-	class Meta:
-		model = UsuarioProjeto
-
-		fields = ('usuario','nome')
-
-
 class ProjetoSerializer(serializers.ModelSerializer):
 	
-	membros = UsuarioProjetoSerializer(source='usuarioprojeto_set', many=True)
 	class Meta:
 
 		abstract = True
@@ -81,15 +68,12 @@ class ProjetoSerializer(serializers.ModelSerializer):
 		def create(self, validated_data):
 			return Projeto.objects.create(**validated_data)
 
-		def update(self, instance, validated_data):
-			instance.nome = validated_data.get('nome', instance.nome)
-			instance.descricao = validated_data.get('descricao', instance.nivel_acesso)
+class UsuarioProjetoSerializer(serializers.ModelSerializer):
 
-			instance.save()
+	class Meta:
+		model = UsuarioProjeto
 
-			return instance
-
-
+		
 class ProjetoReadSerializer(ProjetoSerializer):
     instituicao = InstituicaoSerializer()
     membros = UsuarioSerializer(many=True)

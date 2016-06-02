@@ -206,11 +206,14 @@ class Projeto(models.Model):
 	atualizado_em = models.DateTimeField(auto_now = True)
 
 
+
 class UsuarioProjeto(models.Model):
 	""" Relacao de projetos que um usuario participa e seu papel no mesmo """
 	usuario = models.ForeignKey(Usuario)
 	projeto = models.ForeignKey(Projeto)
 	papel = models.ForeignKey(PapelProjeto)
+
+
 
 class ProjetoAmostra(models.Model):
 	"""Relacao de amostras enviadas compondo um projeto"""

@@ -89,13 +89,7 @@ class ServicoViewSet(viewsets.ModelViewSet):
 	serializer_class = ServicoSerializer
 
 	def get_permissions(self):
-		if self.request.method in permissions.SAFE_METHODS:
-			return (permissions.AllowAny(),)
-
-		if self.request.method == 'POST':
-			return (permissions.AllowAny(),)
-
-		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		return (permissions.AllowAny(),)
 
 	def create(self, request):
 		serializer = self.serializer_class(data=request.data)
@@ -119,13 +113,7 @@ class SistemaViewSet(viewsets.ModelViewSet):
 	serializer_class = SistemaSerializer
 
 	def get_permissions(self):
-		if self.request.method in permissions.SAFE_METHODS:
-			return (permissions.AllowAny(),)
-
-		if self.request.method == 'POST':
-			return (permissions.AllowAny(),)
-
-		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		return (permissions.AllowAny(),)
 
 	def create(self, request):
 		serializer = self.serializer_class(data=request.data)
@@ -149,13 +137,7 @@ class KitDeplecaoViewSet(viewsets.ModelViewSet):
 	serializer_class = KitDeplecaoSerializer
 
 	def get_permissions(self):
-		if self.request.method in permissions.SAFE_METHODS:
-			return (permissions.AllowAny(),)
-
-		if self.request.method == 'POST':
-			return (permissions.AllowAny(),)
-
-		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		return (permissions.AllowAny(),)
 
 	def create(self, request):
 		serializer = self.serializer_class(data=request.data)
@@ -185,7 +167,7 @@ class InstituicaoViewSet(viewsets.ModelViewSet):
 		if self.request.method == 'POST':
 			return (permissions.AllowAny(),)
 
-		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		return (permissions.IsAuthenticated(),)
 
 	def create(self, request):
 		serializer = self.serializer_class(data=request.data)
@@ -223,7 +205,7 @@ class ProjetoViewSet(viewsets.ModelViewSet):
 		if self.request.method == 'POST':
 			return (permissions.AllowAny(),)
 
-		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		return (permissions.IsAuthenticated(),)
 
 	def create(self, request, format=None):
 		r = ProjetoSerializer(data=request.data)

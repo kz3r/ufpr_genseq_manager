@@ -192,8 +192,7 @@ class Projeto(models.Model):
 	descricao = models.TextField()
 	membros = models.ManyToManyField(
 		Usuario,
-		through = 'UsuarioProjeto',
-		through_fields = ('projeto','usuario')
+		through = 'UsuarioProjeto'
 	)
 
 	amostras = models.ManyToManyField(
@@ -209,9 +208,10 @@ class Projeto(models.Model):
 
 class UsuarioProjeto(models.Model):
 	""" Relacao de projetos que um usuario participa e seu papel no mesmo """
-	usuario = models.ForeignKey(Usuario)
-	projeto = models.ForeignKey(Projeto)
+	projeto = models.ForeignKey(Projeto, related_name='usuarioprojetos')
+	usuario = models.ForeignKey(Usuario, related_name='usuarioprojetos')
 	papel = models.ForeignKey(PapelProjeto)
+	
 
 
 

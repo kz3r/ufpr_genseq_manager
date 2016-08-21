@@ -1,11 +1,17 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
-from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto
+from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, NivelAcesso
+
+class NivelAcessoSerializer(serializers.ModelSerializer):
+	
+	class Meta:
+		model = NivelAcesso
+
+		fields = ('id','descricao')
 
 class UsuarioSerializer(serializers.ModelSerializer):
 	password = serializers.CharField (write_only = True, required = False)
 	confirm_password = serializers.CharField (write_only = True, required = False)
-
 	class Meta:
 		model = Usuario
 
@@ -40,6 +46,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 			return instance
 
+class PapelProjetoSerializer(serializers.ModelSerializer):
+	
+	class Meta:
+		model = PapelProjeto
+
+		fields = ('id','descricao')
 
 class InstituicaoSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -55,34 +67,42 @@ class InstituicaoSerializer(serializers.ModelSerializer):
 
 			return instance
 
-class ProjetoSerializer(serializers.ModelSerializer):
-	
-	class Meta:
-
-		abstract = True
-		model = Projeto
-
-		fields = ('id', 'nome', 'descricao', 'instituicao', 'membros')
-		read_only_fields = ('criado_em', 'atualizado_em', 'autorizado_em')
-
-		def create(self, validated_data):
-			return Projeto.objects.create(**validated_data)
-
 class UsuarioProjetoSerializer(serializers.ModelSerializer):
-
 	class Meta:
 		model = UsuarioProjeto
+		fields = ('id', 'usuario','papel','projeto')
 
-		
+	def create(self, validated_data):
+		return UsuarioProjeto.objects.create(**validated_data)
+
+
+class UsuarioProjetoReadSerializer(UsuarioProjetoSerializer):
+	usuario = UsuarioSerializer()
+	papel = PapelProjetoSerializer()
+	class Meta:
+		model = UsuarioProjeto
+		fields = ('id','usuario','papel')
+
+
+class ProjetoSerializer(serializers.ModelSerializer):
+
+	
+	class Meta:
+		model = Projeto
+
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em')
+
+	def create(self, validated_data):
+		return Projeto.objects.create(**validated_data)
+
 class ProjetoReadSerializer(ProjetoSerializer):
     instituicao = InstituicaoSerializer()
-    membros = UsuarioSerializer(many=True)
-
+    membros = UsuarioProjetoReadSerializer(many=True, source='usuarioprojetos')
     class Meta:
 
 		model = Projeto
 
-		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em', 'membros')
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em','membros')
 
 class KitDeplecaoSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -127,6 +147,7 @@ class ServicoSerializer(serializers.ModelSerializer):
 
 			return instance
 
+
 class StatusUsuarioSerializer(serializers.ModelSerializer):
 	
 	class Meta:
@@ -143,4 +164,6 @@ class StatusUsuarioSerializer(serializers.ModelSerializer):
 			instance.save()
 
 			return instance
+
+
 

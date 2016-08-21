@@ -8,8 +8,8 @@ from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
 
 from genseq.permissions import IsAccountOwner
-from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer, ProjetoReadSerializer, UsuarioProjetoSerializer
+from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -187,37 +187,23 @@ class InstituicaoViewSet(viewsets.ModelViewSet):
 			}, status = status.HTTP_400_BAD_REQUEST)
 
 
-
 class ProjetoViewSet(viewsets.ModelViewSet):
 	queryset = Projeto.objects.all()
 	serializer_class = ProjetoSerializer
 
 	def get_serializer_class(self):
 		if self.request.method == 'GET':
-			return ProjetoReadSerializer
+		 	return ProjetoReadSerializer
 		else:
 			return self.serializer_class
 
-	def get_permissions(self):
-		if self.request.method in permissions.SAFE_METHODS:
-			return (permissions.AllowAny(),)
+class UsuarioProjetoViewSet(viewsets.ModelViewSet):
+	queryset = UsuarioProjeto.objects.all()
+	serializer_class = UsuarioProjetoSerializer
 
-		if self.request.method == 'POST':
-			return (permissions.AllowAny(),)
+	def get_serializer_class(self):
+		return self.serializer_class
 
-		return (permissions.IsAuthenticated(),)
-
-	def create(self, request, format=None):
-		r = ProjetoSerializer(data=request.data)
-		if r.is_valid():
-			u = r.save()
-			u = r.save()
-			m = request.data['membros']
-			for membro in m:
-				membro_id = membro['id']
-				s = UsuarioProjetoSerializer(data={'projeto':u.id, 'usuario':membro_id, 'papel':1})
-				if s.is_valid():
-					s.save()
-			return Response(r.data, status=status.HTTP_201_CREATED)
-		return Response(r.errors, status=status.HTTP_400_BAD_REQUEST)
-
+class PapelProjetoViewSet(viewsets.ModelViewSet):
+	queryset = PapelProjeto.objects.all()
+	serializer_class = PapelProjetoSerializer

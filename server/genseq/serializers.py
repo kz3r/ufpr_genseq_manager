@@ -1,6 +1,6 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
-from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, NivelAcesso
+from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, NivelAcesso, Amostra, ProjetoAmostra
 
 class NivelAcessoSerializer(serializers.ModelSerializer):
 	
@@ -15,7 +15,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Usuario
 
-		fields = ('id','nivel_acesso', 'status', 'responsavel', 'instituicao',
+		fields = ('id','nivel_acesso', 'status', 'instituicao',
 					 'nome', 'telefone', 'setor', 'email',
 					 'password', 'confirm_password',)
 
@@ -46,77 +46,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 			return instance
 
-class PapelProjetoSerializer(serializers.ModelSerializer):
-	
-	class Meta:
-		model = PapelProjeto
-
-		fields = ('id','descricao')
-
-class InstituicaoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Instituicao
-		fields = ('id', 'nome')
-
-		def create(self, validated_data):
-			return Instituicao.objects.create(**validated_data)
-		def update(self, instance, validated_data):
-			instance.nome  = validated_data.get('nome', instance.nome)
-
-			instance.save()
-
-			return instance
-
-class UsuarioProjetoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = UsuarioProjeto
-		fields = ('id', 'usuario','papel','projeto')
-
-	def create(self, validated_data):
-		return UsuarioProjeto.objects.create(**validated_data)
-
-
-class UsuarioProjetoReadSerializer(UsuarioProjetoSerializer):
-	usuario = UsuarioSerializer()
-	papel = PapelProjetoSerializer()
-	class Meta:
-		model = UsuarioProjeto
-		fields = ('id','usuario','papel')
-
-
-class ProjetoSerializer(serializers.ModelSerializer):
-
-	
-	class Meta:
-		model = Projeto
-
-		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em')
-
-	def create(self, validated_data):
-		return Projeto.objects.create(**validated_data)
-
-class ProjetoReadSerializer(ProjetoSerializer):
-    instituicao = InstituicaoSerializer()
-    membros = UsuarioProjetoReadSerializer(many=True, source='usuarioprojetos')
-    class Meta:
-
-		model = Projeto
-
-		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em','membros')
-
-class KitDeplecaoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = KitDeplecao
-		fields = ('id', 'descricao')
-
-		def create(self, validated_data):
-			return KitDeplecao.objects.create(**validated_data)
-		def update(self, instance, validated_data):
-			instance.descricao  = validated_data.get('descricao', instance.descricao)
-
-			instance.save()
-
-			return instance
 
 
 class SistemaSerializer(serializers.ModelSerializer):
@@ -147,6 +76,103 @@ class ServicoSerializer(serializers.ModelSerializer):
 
 			return instance
 
+
+class PapelProjetoSerializer(serializers.ModelSerializer):
+	
+	class Meta:
+		model = PapelProjeto
+
+		fields = ('id','descricao')
+
+class InstituicaoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Instituicao
+		fields = ('id', 'nome')
+
+		def create(self, validated_data):
+			return Instituicao.objects.create(**validated_data)
+		def update(self, instance, validated_data):
+			instance.nome  = validated_data.get('nome', instance.nome)
+
+			instance.save()
+
+			return instance
+
+class AmostraSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Amostra
+		fields = ('id', 'sistema', 'servico', 'tipo', 'status','organismo')
+
+class AmostraReadSerializer(AmostraSerializer):
+	sistema = SistemaSerializer()
+	servico = ServicoSerializer()
+
+	class Meta:
+		model = Amostra
+		fields = ('id', 'sistema', 'servico', 'tipo', 'status','organismo')
+
+class UsuarioProjetoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = UsuarioProjeto
+		fields = ('id', 'usuario','papel','projeto')
+
+	def create(self, validated_data):
+		return UsuarioProjeto.objects.create(**validated_data)
+
+
+class UsuarioProjetoReadSerializer(UsuarioProjetoSerializer):
+	usuario = UsuarioSerializer()
+	papel = PapelProjetoSerializer()
+	class Meta:
+		model = UsuarioProjeto
+		fields = ('id','usuario','papel')
+
+class ProjetoAmostraSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = ProjetoAmostra
+		fields = ('id', 'projeto', 'amostra', 'responsavel_envio')
+
+class ProjetoAmostraReadSerializer(ProjetoAmostraSerializer):
+	amostra = AmostraReadSerializer()
+
+	class Meta:
+		model = ProjetoAmostra
+		fields = ('id', 'amostra')
+
+class ProjetoSerializer(serializers.ModelSerializer):
+
+	
+	class Meta:
+		model = Projeto
+
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em')
+
+	def create(self, validated_data):
+		return Projeto.objects.create(**validated_data)
+
+class ProjetoReadSerializer(ProjetoSerializer):
+    instituicao = InstituicaoSerializer()
+    membros = UsuarioProjetoReadSerializer(many=True, source='usuarioprojetos')
+    amostras = ProjetoAmostraReadSerializer(many=True, source='projetoamostras')
+    class Meta:
+
+		model = Projeto
+
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em','membros', 'amostras')
+
+class KitDeplecaoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = KitDeplecao
+		fields = ('id', 'descricao')
+
+		def create(self, validated_data):
+			return KitDeplecao.objects.create(**validated_data)
+		def update(self, instance, validated_data):
+			instance.descricao  = validated_data.get('descricao', instance.descricao)
+
+			instance.save()
+
+			return instance
 
 class StatusUsuarioSerializer(serializers.ModelSerializer):
 	

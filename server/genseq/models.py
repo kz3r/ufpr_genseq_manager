@@ -131,7 +131,6 @@ class Usuario(AbstractBaseUser):
 	NivelAcesso"""
 
 	nivel_acesso = models.ForeignKey(NivelAcesso, null = True)
-	responsavel = models.ForeignKey('self', null = True)
 	status = models.ForeignKey(StatusUsuario, null = True)
 	instituicao = models.ForeignKey(Instituicao, null = True)
 
@@ -171,8 +170,9 @@ class Amostra(models.Model):
 	sistema = models.ForeignKey(Sistema)
 	servico = models.ForeignKey(Servico)
 
+	organismo = models.CharField(max_length = 100)
 	cod_origem = models.CharField(max_length = 20)
-	qualidade = models.DecimalField(max_digits = 10, decimal_places = 3)
+	qualidade = models.DecimalField(max_digits = 10, decimal_places = 3, null = True)
 	tipo = models.CharField(max_length = 1, choices = escolhas_tipo_organismo)
 	observacao = models.CharField(max_length = 100)
 	autorizado_em = models.DateTimeField(null = True)
@@ -197,8 +197,7 @@ class Projeto(models.Model):
 
 	amostras = models.ManyToManyField(
 		Amostra,
-		through = 'ProjetoAmostra',
-		through_fields = ('projeto','amostra')
+		through = 'ProjetoAmostra'
 	)
 
 	criado_em = models.DateTimeField(auto_now_add = True)
@@ -217,8 +216,8 @@ class UsuarioProjeto(models.Model):
 
 class ProjetoAmostra(models.Model):
 	"""Relacao de amostras enviadas compondo um projeto"""
-	projeto = models.ForeignKey(Projeto)
-	amostra = models.ForeignKey(Amostra)
+	projeto = models.ForeignKey(Projeto, related_name='projetoamostras')
+	amostra = models.ForeignKey(Amostra, related_name='projetoamostras')
 	responsavel_envio = models.ForeignKey(Usuario)
 
 	criado_em = models.DateTimeField(auto_now_add = True)

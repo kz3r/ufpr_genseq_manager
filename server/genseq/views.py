@@ -8,8 +8,8 @@ from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
 
 from genseq.permissions import IsAccountOwner
-from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer
+from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, ProjetoAmostraSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -204,6 +204,17 @@ class UsuarioProjetoViewSet(viewsets.ModelViewSet):
 	def get_serializer_class(self):
 		return self.serializer_class
 
+class ProjetoAmostraViewSet(viewsets.ModelViewSet):
+	queryset = ProjetoAmostra.objects.all()
+	serializer_class = ProjetoAmostraSerializer
+
+	def get_serializer_class(self):
+		return self.serializer_class
+
 class PapelProjetoViewSet(viewsets.ModelViewSet):
 	queryset = PapelProjeto.objects.all()
 	serializer_class = PapelProjetoSerializer
+
+class AmostraViewSet(viewsets.ModelViewSet):
+	queryset = Amostra.objects.all()
+	serializer_class = AmostraSerializer

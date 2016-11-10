@@ -227,13 +227,17 @@ class Corrida(models.Model):
 	"""Registro da corrida de sequenciamento"""
 	sistema = models.ForeignKey(Sistema)
 	servico = models.ForeignKey(Servico)
+	amostras = models.ManyToManyField(
+		Amostra,
+		through = 'AmostraCorrida'
+	)
 
 	detalhes = models.TextField()
-	data_hora = models.DateTimeField()
+	data_hora = models.DateTimeField(auto_now_add = True)
 
 class AmostraCorrida(models.Model):
-	amostra = models.ForeignKey(Amostra)
-	corrida = models.ForeignKey(Corrida)
+	amostra = models.ForeignKey(Amostra, related_name='amostrascorrida')
+	corrida = models.ForeignKey(Corrida, related_name='amostrascorrida')
 	kit_deplecao = models.ForeignKey(KitDeplecao)
 
 	resultado = models.DecimalField(max_digits = 10, decimal_places = 3)

@@ -8,8 +8,8 @@ from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
 
 from genseq.permissions import IsAccountOwner
-from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, ProjetoAmostraSerializer
+from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra, Corrida, AmostraCorrida
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, AmostraReadSerializer, ProjetoAmostraSerializer, CorridaSerializer, CorridaReadSerializer, AmostraCorridaSerializer, AmostraCorridaReadSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -218,3 +218,29 @@ class PapelProjetoViewSet(viewsets.ModelViewSet):
 class AmostraViewSet(viewsets.ModelViewSet):
 	queryset = Amostra.objects.all()
 	serializer_class = AmostraSerializer
+	def get_serializer_class(self):
+		if self.request.method == 'GET':
+		 	return AmostraReadSerializer
+		else:
+			return self.serializer_class
+
+
+class CorridaViewSet(viewsets.ModelViewSet):
+	queryset = Corrida.objects.all()
+	serializer_class = CorridaSerializer
+
+	def get_serializer_class(self):
+		if self.request.method == 'GET':
+		 	return CorridaReadSerializer
+		else:
+			return self.serializer_class
+
+class AmostraCorridaViewSet(viewsets.ModelViewSet):
+	queryset = AmostraCorrida.objects.all()
+	serializer_class = AmostraCorridaSerializer
+
+	def get_serializer_class(self):
+		if self.request.method == 'GET':
+		 	return AmostraCorridaReadSerializer
+		else:
+			return self.serializer_class

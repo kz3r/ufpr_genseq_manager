@@ -1,6 +1,6 @@
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import serializers
-from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, NivelAcesso, Amostra, ProjetoAmostra, Corrida, AmostraCorrida
+from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, NivelAcesso, Amostra, ProjetoAmostra, Corrida, AmostraCorrida, StatusAmostra
 
 class NivelAcessoSerializer(serializers.ModelSerializer):
 	
@@ -84,19 +84,17 @@ class PapelProjetoSerializer(serializers.ModelSerializer):
 
 		fields = ('id','descricao')
 
+class StatusAmostraSerializer(serializers.ModelSerializer):
+	
+	class Meta:
+		model = StatusAmostra
+
+		fields = ('id','descricao')
+
 class InstituicaoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Instituicao
 		fields = ('id', 'nome')
-
-		def create(self, validated_data):
-			return Instituicao.objects.create(**validated_data)
-		def update(self, instance, validated_data):
-			instance.nome  = validated_data.get('nome', instance.nome)
-
-			instance.save()
-
-			return instance
 
 
 class ProjetoSerializer(serializers.ModelSerializer):
@@ -105,7 +103,7 @@ class ProjetoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Projeto
 
-		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em')
+		fields = ('id', 'nome', 'descricao', 'instituicao', 'criado_em', 'atualizado_em', 'autorizado_em', 'autorizado_por')
 
 	def create(self, validated_data):
 		return Projeto.objects.create(**validated_data)
@@ -118,6 +116,7 @@ class AmostraSerializer(serializers.ModelSerializer):
 class AmostraReadSerializer(AmostraSerializer):
 	sistema = SistemaSerializer()
 	servico = ServicoSerializer()
+	status = StatusAmostraSerializer()
 
 	class Meta:
 		model = Amostra

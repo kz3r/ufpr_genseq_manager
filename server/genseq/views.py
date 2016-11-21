@@ -3,9 +3,9 @@
 import json
 
 from django.contrib.auth import authenticate, login, logout
-
 from rest_framework import status, views, permissions, viewsets
 from rest_framework.response import Response
+from rest_framework import generics
 
 from genseq.permissions import IsAccountOwner
 from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra, Corrida, AmostraCorrida
@@ -160,42 +160,28 @@ class InstituicaoViewSet(viewsets.ModelViewSet):
 	queryset = Instituicao.objects.all()
 	serializer_class = InstituicaoSerializer
 
-	def get_permissions(self):
-		if self.request.method in permissions.SAFE_METHODS:
-			return (permissions.AllowAny(),)
-
-		if self.request.method == 'POST':
-			return (permissions.AllowAny(),)
-
-		return (permissions.IsAuthenticated(),)
-
-	def create(self, request):
-		serializer = self.serializer_class(data=request.data)
-
-		if serializer.is_valid():
-			Instituicao.objects.create_instituicao(**serializer.validated_data)
-
-			response = Response(serializer.validated_data, status = status.HTTP_201_CREATED)
-			response['Access-Control-Allow-Origin'] = '*'
-			response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-
-			return response
-
-		return Response({
-			'status': 'Bad request',
-			'message': 'Instituicao nao pode ser inserido com os dados recebidos'
-			}, status = status.HTTP_400_BAD_REQUEST)
+	def get_serializer_class(self):
+		return self.serializer_class
 
 
 class ProjetoViewSet(viewsets.ModelViewSet):
 	queryset = Projeto.objects.all()
 	serializer_class = ProjetoSerializer
 
+	def get_queryset(self):
+		queryset = Projeto.objects.all()
+		user = self.request.query_params.get('user', None)
+		if user is not None:
+			queryset = queryset.filter(usuarioprojetos__id=user)
+		return queryset
+
 	def get_serializer_class(self):
 		if self.request.method == 'GET':
-		 	return ProjetoReadSerializer
+			return ProjetoReadSerializer
 		else:
 			return self.serializer_class
+
+
 
 class UsuarioProjetoViewSet(viewsets.ModelViewSet):
 	queryset = UsuarioProjeto.objects.all()

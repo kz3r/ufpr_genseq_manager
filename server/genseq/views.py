@@ -204,6 +204,13 @@ class PapelProjetoViewSet(viewsets.ModelViewSet):
 class AmostraViewSet(viewsets.ModelViewSet):
 	queryset = Amostra.objects.all()
 	serializer_class = AmostraSerializer
+
+	def get_queryset(self):
+		queryset = Amostra.objects.all()
+		amostra = self.request.query_params.get('amostra', None)
+		if amostra is not None:
+			queryset = queryset.filter(id=amostra)
+		return queryset
 	def get_serializer_class(self):
 		if self.request.method == 'GET':
 		 	return AmostraReadSerializer
@@ -214,6 +221,13 @@ class AmostraViewSet(viewsets.ModelViewSet):
 class CorridaViewSet(viewsets.ModelViewSet):
 	queryset = Corrida.objects.all()
 	serializer_class = CorridaSerializer
+
+	def get_queryset(self):
+		queryset = Corrida.objects.all()
+		amostra = self.request.query_params.get('amostra', None)
+		if amostra is not None:
+			queryset = queryset.filter(amostrascorrida__amostra=amostra)
+		return queryset
 
 	def get_serializer_class(self):
 		if self.request.method == 'GET':

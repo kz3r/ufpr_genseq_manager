@@ -161,7 +161,7 @@ class Amostra(models.Model):
 	cod_origem = models.CharField(max_length = 20)
 	qualidade = models.DecimalField(max_digits = 10, decimal_places = 3, null = True)
 	tipo = models.CharField(max_length = 1, choices = escolhas_tipo_organismo)
-	observacao = models.CharField(max_length = 100)
+	observacao = models.CharField(max_length = 100, null = True, blank = True )
 	autorizado_em = models.DateTimeField(null = True)
 
 	criado_em = models.DateTimeField(auto_now_add = True)

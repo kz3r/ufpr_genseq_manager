@@ -158,8 +158,8 @@ class Amostra(models.Model):
 	servico = models.ForeignKey(Servico)
 
 	organismo = models.CharField(max_length = 100)
-	cod_origem = models.CharField(max_length = 20)
-	qualidade = models.DecimalField(max_digits = 10, decimal_places = 3, null = True)
+	cod_origem = models.CharField(max_length = 20, null = True, blank = True)
+	qualidade = models.DecimalField(max_digits = 10, decimal_places = 3, null = True, blank = True)
 	tipo = models.CharField(max_length = 1, choices = escolhas_tipo_organismo)
 	observacao = models.CharField(max_length = 100, null = True, blank = True )
 	autorizado_em = models.DateTimeField(null = True)

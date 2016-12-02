@@ -111,7 +111,7 @@ class ProjetoSerializer(serializers.ModelSerializer):
 class AmostraSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Amostra
-		fields = ('id', 'sistema', 'servico', 'tipo', 'status','organismo', 'observacao')
+		fields = ('id', 'sistema', 'servico', 'tipo', 'status','organismo', 'observacao','qualidade', 'cod_origem')
 
 class AmostraReadSerializer(AmostraSerializer):
 	sistema = SistemaSerializer()
@@ -120,7 +120,7 @@ class AmostraReadSerializer(AmostraSerializer):
 
 	class Meta:
 		model = Amostra
-		fields = ('id', 'sistema', 'servico', 'tipo', 'status', 'observacao', 'organismo')
+		fields = ('id', 'sistema', 'servico', 'tipo', 'status', 'observacao', 'organismo', 'qualidade', 'cod_origem')
 
 class UsuarioProjetoSerializer(serializers.ModelSerializer):
 	class Meta:

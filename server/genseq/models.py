@@ -86,13 +86,13 @@ class UsuarioManager(BaseUserManager):
 
 	def create_user(self, email, password=None, **kwargs):
 		if not email:
-			raise ValueError('Por favor, digite um email valido.')	
+			raise ValueError('Por favor, digite um email valido.')
 
 		if not kwargs.get('nome'):
 			raise ValueError('Por favor, digite o nome completo.')
 
 		usuario = self.model(
-			email = self.normalize_email(email), nome = kwargs.get('nome')
+			email = self.normalize_email(email), nome = kwargs.get('nome'), nivel_acesso = kwargs.get('nivel_acesso')
 		)
 
 		usuario.set_password(password)
@@ -197,7 +197,7 @@ class UsuarioProjeto(models.Model):
 	projeto = models.ForeignKey(Projeto, related_name='usuarioprojetos')
 	usuario = models.ForeignKey(Usuario, related_name='usuarioprojetos')
 	papel = models.ForeignKey(PapelProjeto)
-	
+
 
 
 
@@ -236,12 +236,3 @@ class AmostraCorrida(models.Model):
 	criado_em = models.DateTimeField(auto_now_add = True)
 	atualizado_em = models.DateTimeField(auto_now = True)
 	atualizado_por = models.ForeignKey(Usuario, related_name = 'amostra_corrida_usuario_atualizacao')
-
-
-
-
-
-
-
-
-

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from genseq.models import StatusUsuario, Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, NivelAcesso, Amostra, ProjetoAmostra, Corrida, AmostraCorrida, StatusAmostra
 
 class NivelAcessoSerializer(serializers.ModelSerializer):
-	
+
 	class Meta:
 		model = NivelAcesso
 
@@ -22,6 +22,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
 		read_only_fields = ('criado_em', 'atualizado_em',)
 
 		def create(self, validated_data):
+			print 'SERIALIZERS'
+			print validated_data
 			return Usuario.objects.create(**validated_data)
 
 		def update(self, instance, validated_data):
@@ -78,14 +80,14 @@ class ServicoSerializer(serializers.ModelSerializer):
 
 
 class PapelProjetoSerializer(serializers.ModelSerializer):
-	
+
 	class Meta:
 		model = PapelProjeto
 
 		fields = ('id','descricao')
 
 class StatusAmostraSerializer(serializers.ModelSerializer):
-	
+
 	class Meta:
 		model = StatusAmostra
 
@@ -99,7 +101,7 @@ class InstituicaoSerializer(serializers.ModelSerializer):
 
 class ProjetoSerializer(serializers.ModelSerializer):
 
-	
+
 	class Meta:
 		model = Projeto
 
@@ -204,7 +206,7 @@ class ProjetoReadSerializer(ProjetoSerializer):
 
 
 class StatusUsuarioSerializer(serializers.ModelSerializer):
-	
+
 	class Meta:
 		model = StatusUsuario
 
@@ -219,6 +221,3 @@ class StatusUsuarioSerializer(serializers.ModelSerializer):
 			instance.save()
 
 			return instance
-
-
-

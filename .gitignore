@@ -1,2 +1,4 @@
 *.pyc
 *.sqlite3
+server/genseq/migrations/0009_auto_20160607_1711.py
+server/genseq/migrations/0010_auto_20161123_2230.py

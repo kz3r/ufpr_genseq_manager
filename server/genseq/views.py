@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import generics
 
 from genseq.permissions import IsAccountOwner
-from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra, Corrida, AmostraCorrida
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, AmostraReadSerializer, ProjetoAmostraSerializer, CorridaSerializer, CorridaReadSerializer, AmostraCorridaSerializer, AmostraCorridaReadSerializer
+from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra, Corrida, AmostraCorrida, NivelAcesso
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, AmostraReadSerializer, ProjetoAmostraSerializer, CorridaSerializer, CorridaReadSerializer, AmostraCorridaSerializer, AmostraCorridaReadSerializer, NivelAcessoSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -28,8 +28,11 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
 	def create(self, request):
 		serializer = self.serializer_class(data=request.data)
-
+		print 'DEF SERIALIZER>>'
+		print serializer
 		if serializer.is_valid():
+			print "Views>>"
+			print serializer.validated_data
 			Usuario.objects.create_user(**serializer.validated_data)
 
 			response = Response(serializer.validated_data, status = status.HTTP_201_CREATED)
@@ -45,11 +48,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
 class LoginView(views.APIView):
 	def post(self, request, format=None):
-		print('IM IN')
-
 		data = json.loads(request.body.decode())
-
-
 		email = data.get('email', None)
 		password = data.get('password', None)
 
@@ -74,7 +73,7 @@ class LoginView(views.APIView):
 			}, status = status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(views.APIView):
-	
+
 	#PERMISSION CLASS BLOQUEANDO O ACESSO. PORQUE?
 	#permission_classes = (permissions.IsAuthenticated,)
 	#print(permission_classes)
@@ -155,6 +154,13 @@ class KitDeplecaoViewSet(viewsets.ModelViewSet):
 			'status': 'Bad request',
 			'message': 'Kit Deplecao nao pode ser inserido com os dados recebidos'
 			}, status = status.HTTP_400_BAD_REQUEST)
+
+class NivelAcessoViewSet(viewsets.ModelViewSet):
+	queryset = NivelAcesso.objects.all()
+	serializer_class = NivelAcessoSerializer
+
+	def get_permissions(self):
+		return (permissions.AllowAny(),)
 
 class InstituicaoViewSet(viewsets.ModelViewSet):
 	queryset = Instituicao.objects.all()

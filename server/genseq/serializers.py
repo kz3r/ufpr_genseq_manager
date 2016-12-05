@@ -21,10 +21,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 		read_only_fields = ('criado_em', 'atualizado_em',)
 
-		def create(self, validated_data):
-			print 'SERIALIZERS'
-			print validated_data
-			return Usuario.objects.create(**validated_data)
 
 		def update(self, instance, validated_data):
 			instance.nome = validated_data.get('nome', instance.nome)

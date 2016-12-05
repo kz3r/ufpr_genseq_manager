@@ -92,7 +92,7 @@ class UsuarioManager(BaseUserManager):
 			raise ValueError('Por favor, digite o nome completo.')
 
 		usuario = self.model(
-			email = self.normalize_email(email), nome = kwargs.get('nome'), nivel_acesso = kwargs.get('nivel_acesso')
+			email = self.normalize_email(email), nome = kwargs.get('nome'), nivel_acesso = kwargs.get('nivel_acesso'), instituicao= kwargs.get('instituicao')
 		)
 
 		usuario.set_password(password)

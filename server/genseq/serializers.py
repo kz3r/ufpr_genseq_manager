@@ -24,21 +24,29 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 		def update(self, instance, validated_data):
 			instance.nome = validated_data.get('nome', instance.nome)
+			print instance
 			instance.nivel_acesso = validated_data.get('nivel_acesso', instance.nivel_acesso)
+			print instance
 			instance.status = validated_data.get('status', instance.status)
+			print instance
 			instance.instituicao = validated_data.get('instituicao', instance.instituicao)
+			print instance
 			instance.telefone = validated_data.get('telefone', instance.telefone)
+			print instance
 			instance.setor = validated_data.get('setor', instance.setor)
+			print instance
 			instance.email = validated_data.get('email', instance.email)
 
+			print instance
 			instance.save()
 
-			password = validated_data.get('password', None)
-			confirm_password = validated_data.get('confirm_password', None)
+			if validated_data.get('password', None):
+				password = validated_data.get('password', None)
+				confirm_password = validated_data.get('confirm_password', None)
 
-			if password and confirm_password and password == confirm_password:
-				instance.set_password(password)
-				instance.save()
+				if password and confirm_password and password == confirm_password:
+					instance.set_password(password)
+					instance.save()
 
 			update_session_auth_hash(self.context.get('request'), instance)
 
@@ -217,3 +225,12 @@ class StatusUsuarioSerializer(serializers.ModelSerializer):
 			instance.save()
 
 			return instance
+
+class UsuarioReadSerializer(UsuarioSerializer):
+	instituicao = InstituicaoSerializer()
+	nivel_acesso = NivelAcessoSerializer()
+
+	class Meta:
+		model = Usuario
+		fields = fields = ('id','nivel_acesso', 'status', 'instituicao',
+					 'nome', 'telefone', 'setor', 'email')

@@ -9,33 +9,34 @@ from rest_framework import generics
 
 from genseq.permissions import IsAccountOwner
 from genseq.models import Usuario, Servico, Sistema, KitDeplecao, Instituicao, Projeto, UsuarioProjeto, PapelProjeto, Amostra, ProjetoAmostra, Corrida, AmostraCorrida, NivelAcesso
-from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, AmostraReadSerializer, ProjetoAmostraSerializer, CorridaSerializer, CorridaReadSerializer, AmostraCorridaSerializer, AmostraCorridaReadSerializer, NivelAcessoSerializer
+from genseq.serializers import UsuarioSerializer, ServicoSerializer, SistemaSerializer, KitDeplecaoSerializer, InstituicaoSerializer, ProjetoSerializer,ProjetoReadSerializer, UsuarioProjetoSerializer, PapelProjetoSerializer, AmostraSerializer, AmostraReadSerializer, ProjetoAmostraSerializer, CorridaSerializer, CorridaReadSerializer, AmostraCorridaSerializer, AmostraCorridaReadSerializer, NivelAcessoSerializer, UsuarioReadSerializer
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
-	lookup_field = 'username'
+	# lookup_field = 'username'
 	queryset = Usuario.objects.all()
 	serializer_class = UsuarioSerializer
 
 	def get_permissions(self):
 		if self.request.method in permissions.SAFE_METHODS:
+			print 'SAFE'
 			return (permissions.AllowAny(),)
 
 		if self.request.method == 'POST':
+			print 'POST'
 			return (permissions.AllowAny(),)
 
-		return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		print 'RESTO'
+		# return (permissions.IsAuthenticated(), IsAccountOwner(),)
+		return (permissions.AllowAny(),)
 
 	def create(self, request):
 		serializer = self.serializer_class(data=request.data)
-		print 'DEF SERIALIZER>>'
-		print serializer
 		if serializer.is_valid():
-			print "Views>>"
-			print serializer.validated_data
 			Usuario.objects.create_user(**serializer.validated_data)
 
-			response = Response(serializer.validated_data, status = status.HTTP_201_CREATED)
+			print 'User Created'
+			response = Response( status = status.HTTP_201_CREATED)
 			response['Access-Control-Allow-Origin'] = '*'
 			response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
 
@@ -46,6 +47,14 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 			'message': 'Usuario nao pode ser inserido com os dados recebidos'
 		}, status = status.HTTP_400_BAD_REQUEST)
 
+	def put(self, request):
+		print 'putin'
+
+	def get_serializer_class(self):
+		if self.request.method == 'GET':
+			return UsuarioReadSerializer
+		else:
+			return self.serializer_class
 class LoginView(views.APIView):
 	def post(self, request, format=None):
 		data = json.loads(request.body.decode())

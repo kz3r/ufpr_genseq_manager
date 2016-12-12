@@ -91,10 +91,15 @@ class UsuarioManager(BaseUserManager):
 		if not kwargs.get('nome'):
 			raise ValueError('Por favor, digite o nome completo.')
 
+		nivel_acesso = kwargs.get('nivel_acesso')
+		instituicao = kwargs.get('instituicao')
+
 		usuario = self.model(
-			email = self.normalize_email(email), nome = kwargs.get('nome'), nivel_acesso = kwargs.get('nivel_acesso'), instituicao= kwargs.get('instituicao')
+			email = self.normalize_email(email), nome = kwargs.get('nome')
 		)
 
+		usuario.nivel_acesso = nivel_acesso
+		usuario.instituicao = instituicao
 		usuario.set_password(password)
 		usuario.save()
 
@@ -102,6 +107,7 @@ class UsuarioManager(BaseUserManager):
 
 	def create_superuser(self, email, password, **kwargs):
 		usuario = self.create_user(email, password, **kwargs)
+		print 'CREATE SUPER'
 
 		nivel_acesso = NivelAcesso.objects.get(descricao = 'Administrador')
 		usuario.nivel_acesso = nivel_acesso
